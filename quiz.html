@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .quiz-container {
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      max-width: 650px;
+      width: 90%;
+      text-align: center;
+      animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1, h2, h3, h4 {
+      color: #2c3e50;
+    }
+    .hidden { display: none; }
+    .question { font-size: 22px; margin-bottom: 15px; font-weight: bold; color: #34495e; }
+    .options {
+      list-style: none;
+      padding: 0;
+      text-align: left;
+    }
+    .options li {
+      margin: 12px 0;
+      background: #ecf0f1;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .options li:hover {
+      background: #d0e6fa;
+    }
+    .options input { margin-right: 10px; }
+    button {
+      margin-top: 15px;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      background: #2980b9;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #1c5980;
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #27ae60;
+    }
+    #question-img {
+      width: 100%;
+      max-height: 220px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      object-fit: cover;
+      display: none;
+    }
+    #timer {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #e74c3c;
+    }
+    #difficulty {
+      font-style: italic;
+      color: #7f8c8d;
+      margin-bottom: 5px;
+    }
+    #question-count {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #8e44ad;
+    }
+    #live-leaderboard {
+      text-align: left;
+      margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+    #live-leaderboard h4 {
+      margin: 0 0 5px;
+    }
+    #difficulty-select {
+      margin: 15px 0;
+      padding: 8px 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    input[type="text"] {
+      padding: 8px 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #welcome-screen {
+      background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
+      animation: popIn 1s ease-out;
+    }
+    #welcome-screen h1 {
+      font-size: 40px;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    #welcome-screen p {
+      font-size: 20px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+<div class="quiz-container" id="welcome-screen">
+    <h1>🎉 Welcome to Sahal's Quiz 🎉</h1>
+    <p>Challenge your brain with questions of all levels. Are you ready?</p>
+    <button onclick="startGame()">Start the Challenge</button>
+  </div>
+
+  <div class="quiz-container hidden" id="mode-screen">
+    <h2>Select Game Mode</h2>
+    <label for="difficulty-select">Choose difficulty:</label>
+    <select id="difficulty-select">
+      <option value="All">All</option>
+      <option value="Easy">Easy</option>
+      <option value="Medium">Medium</option>
+      <option value="Hard">Hard</option>
+      <option value="Difficult">Difficult</option>
+    </select>
+    <br>
+    <button onclick="setMode('single')">Single Player</button>
+    <button onclick="setMode('multi')">Multiplayer</button>
+    <br><br>
+    <button onclick="goBack('mode-screen', 'welcome-screen')">⬅ Back</button>
+  </div>
+  
+  <div class="quiz-container hidden" id="name-screen">
+    <h3 id="player-label">Enter your name</h3>
+    <input type="text" id="name-input" placeholder="Your name" />
+    <br><br>
+	<button onclick="goBack('name-screen', 'mode-screen')">⬅ Back</button>
+    <button onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <div class="quiz-container hidden" id="quiz-screen">
+    <h3 id="player-name"></h3>
+    <div id="timer"></div>
+    <div id="difficulty"></div>
+    <div id="question-count"></div>
+    <img id="question-img" src="" alt="Question Image" />
+    <div class="question" id="question">Question?</div>
+    <ul class="options" id="options"></ul>
+	<button onclick="goBack('quiz-screen', 'name-screen')">⬅ Back</button>
+    <button id="submit">Submit</button>
+    <div id="result"></div>
+    <div id="live-leaderboard">
+      <h4>Leaderboard</h4>
+      <ol id="leaderboard-live"></ol>
+    </div>
+  </div>
+
+  <div class="quiz-container hidden" id="final-screen">
+    <h2>Game Over</h2>
+    <div id="final-message"></div>
+    <h3>Leaderboard</h3>
+    <ol id="leaderboard"></ol>
+    <button onclick="location.reload()">Play Again</button>
+    <button onclick="resetLeaderboard()">Reset Leaderboard</button>
+  </div>
+</div>
+
+<script>
+function startGame() {
+      document.getElementById("welcome-screen").classList.add("hidden");
+      document.getElementById("mode-screen").classList.remove("hidden");
+    }
+	 
+
+    function goBack(fromScreen, toScreen) {
+      document.getElementById(fromScreen).classList.add("hidden");
+      document.getElementById(toScreen).classList.remove("hidden");
+    }
+const quizData = [
+  // Easy (10 questions)
+  { question: "What is the capital of France?", options: ["London", "Berlin", "Paris", "Rome"], answer: 2, difficulty: "Easy", image: "" },
+  { question: "Which planet is closest to the sun?", options: ["Venus", "Earth", "Mercury", "Mars"], answer: 2, difficulty: "Easy", image: "" },
+  { question: "How many legs does a spider have?", options: ["6", "8", "10", "12"], answer: 1, difficulty: "Easy", image: "" },
+  { question: "What is 5 + 7?", options: ["10", "11", "12", "13"], answer: 2, difficulty: "Easy", image: "" },
+  { question: "What color do you get when you mix red and white?", options: ["Pink", "Purple", "Orange", "Brown"], answer: 0, difficulty: "Easy", image: "" },
+  { question: "What is the largest mammal?", options: ["Elephant", "Blue Whale", "Giraffe", "Polar Bear"], answer: 1, difficulty: "Easy", image: "" },
+  { question: "What do bees produce?", options: ["Milk", "Honey", "Silk", "Wax"], answer: 1, difficulty: "Easy", image: "" },
+  { question: "Which ocean is the largest?", options: ["Atlantic", "Indian", "Pacific", "Arctic"], answer: 2, difficulty: "Easy", image: "" },
+  { question: "What gas do plants absorb?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], answer: 2, difficulty: "Easy", image: "" },
+  { question: "What is the shape of the Earth?", options: ["Flat", "Round", "Cube", "Pyramid"], answer: 1, difficulty: "Easy", image: "" },
+
+  // Medium (10 questions)
+  { question: "What is the square root of 144?", options: ["10", "12", "13", "14"], answer: 1, difficulty: "Medium", image: "" },
+  { question: "What is the chemical symbol for iron?", options: ["Ir", "Fe", "In", "I"], answer: 1, difficulty: "Medium", image: "" },
+  { question: "Which year did World War I begin?", options: ["1910", "1914", "1918", "1920"], answer: 1, difficulty: "Medium", image: "" },
+  { question: "What is the freezing point of water in Fahrenheit?", options: ["32", "0", "100", "212"], answer: 0, difficulty: "Medium", image: "" },
+  { question: "Who invented the telephone?", options: ["Alexander Graham Bell", "Thomas Edison", "Nikola Tesla", "Isaac Newton"], answer: 0, difficulty: "Medium", image: "" },
+  { question: "What is the capital city of Australia?", options: ["Sydney", "Melbourne", "Canberra", "Brisbane"], answer: 2, difficulty: "Medium", image: "" },
+  { question: "Which planet is known as the Red Planet?", options: ["Mars", "Jupiter", "Saturn", "Venus"], answer: 0, difficulty: "Medium", image: "" },
+  { question: "How many continents are there?", options: ["5", "6", "7", "8"], answer: 2, difficulty: "Medium", image: "" },
+  { question: "What is the largest desert in the world?", options: ["Sahara", "Gobi", "Arctic", "Antarctic"], answer: 0, difficulty: "Medium", image: "" },
+  { question: "Who wrote 'Romeo and Juliet'?", options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"], answer: 1, difficulty: "Medium", image: "" },
+
+  // Hard (10 questions)
+  { question: "Which element has atomic number 92?", options: ["Uranium", "Gold", "Lead", "Mercury"], answer: 0, difficulty: "Hard", image: "" },
+  { question: "Who wrote 'Crime and Punishment'?", options: ["Tolstoy", "Dostoevsky", "Pushkin", "Chekhov"], answer: 1, difficulty: "Hard", image: "" },
+  { question: "What is the capital city of Mongolia?", options: ["Ulaanbaatar", "Astana", "Hanoi", "Tashkent"], answer: 0, difficulty: "Hard", image: "" },
+  { question: "What year did the Berlin Wall fall?", options: ["1987", "1989", "1991", "1993"], answer: 1, difficulty: "Hard", image: "" },
+  { question: "Who painted the 'The Persistence of Memory'?", options: ["Salvador Dalí", "Pablo Picasso", "Claude Monet", "Vincent van Gogh"], answer: 0, difficulty: "Hard", image: "" },
+  { question: "Which gas is most abundant in Earth's atmosphere?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], answer: 1, difficulty: "Hard", image: "" },
+  { question: "What is the smallest prime number?", options: ["0", "1", "2", "3"], answer: 2, difficulty: "Hard", image: "" },
+  { question: "What does DNA stand for?", options: ["Deoxyribonucleic Acid", "Dinucleic Acid", "Dicarboxylic Acid", "Deoxynucleic Acid"], answer: 0, difficulty: "Hard", image: "" },
+  { question: "Which country hosted the 2000 Summer Olympics?", options: ["China", "Australia", "Greece", "USA"], answer: 1, difficulty: "Hard", image: "" },
+  { question: "Who is known as the father of modern physics?", options: ["Isaac Newton", "Albert Einstein", "Galileo Galilei", "Niels Bohr"], answer: 1, difficulty: "Hard", image: "" },
+
+  // Difficult (10 questions)
+  { question: "What is the 7th digit of Pi (after decimal)?", options: ["3", "1", "5", "9"], answer: 2, difficulty: "Difficult", image: "" },
+  { question: "Solve: (2^5) * (2^3)", options: ["16", "32", "64", "256"], answer: 2, difficulty: "Difficult", image: "" },
+  { question: "What is the Heisenberg Uncertainty Principle related to?", options: ["Position and momentum", "Energy and mass", "Time and space", "Light and sound"], answer: 0, difficulty: "Difficult", image: "" },
+  { question: "Which language has the most native speakers?", options: ["English", "Mandarin Chinese", "Hindi", "Spanish"], answer: 1, difficulty: "Difficult", image: "" },
+  { question: "What is the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Endoplasmic Reticulum"], answer: 1, difficulty: "Difficult", image: "" },
+  { question: "What year was the United Nations founded?", options: ["1919", "1945", "1950", "1960"], answer: 1, difficulty: "Difficult", image: "" },
+  { question: "Which composer wrote the 'Moonlight Sonata'?", options: ["Mozart", "Beethoven", "Bach", "Chopin"], answer: 1, difficulty: "Difficult", image: "" },
+  { question: "What is the largest internal organ in the human body?", options: ["Heart", "Liver", "Lungs", "Kidney"], answer: 1, difficulty: "Difficult", image: "" },
+  { question: "In which country is the ancient city of Petra located?", options: ["Egypt", "Jordan", "Lebanon", "Syria"], answer: 1, difficulty: "Difficult", image: "" },
+  { question: "What is the speed of light in vacuum?", options: ["3 x 10^8 m/s", "3 x 10^6 m/s", "3 x 10^4 m/s", "3 x 10^2 m/s"], answer: 0, difficulty: "Difficult", image: "" }
+];
+
+let mode = "single";
+let players = [];
+let currentPlayer = 0;
+let currentQuestion = 0;
+let timerInterval;
+    let timeLeft = 15;
+
+let filteredQuestions = [];
+
+const difficultySelect = document.getElementById("difficulty-select");
+const nameScreen = document.getElementById("name-screen");
+const modeScreen = document.getElementById("mode-screen");
+const quizScreen = document.getElementById("quiz-screen");
+const finalScreen = document.getElementById("final-screen");
+const playerNameEl = document.getElementById("player-name");
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const resultEl = document.getElementById("result");
+const submitBtn = document.getElementById("submit");
+const imgEl = document.getElementById("question-img");
+const timerEl = document.getElementById("timer");
+const finalMsgEl = document.getElementById("final-message");
+const leaderboardEl = document.getElementById("leaderboard");
+const difficultyEl = document.getElementById("difficulty");
+const leaderboardLive = document.getElementById("leaderboard-live");
+const questionCountEl = document.getElementById("question-count");
+
+
+function updateLiveLeaderboard() {
+  leaderboardLive.innerHTML = "";
+  players.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = `${p.name}: ${p.score}`;
+    leaderboardLive.appendChild(li);
+  });
+}
+
+function setMode(selectedMode) {
+  mode = selectedMode;
+  modeScreen.classList.add("hidden");
+  nameScreen.classList.remove("hidden");
+  document.getElementById("player-label").textContent = mode === "multi" ? "Enter Player 1 Name" : "Enter Your Name";
+  const selectedDifficulty = difficultySelect.value;
+  filteredQuestions = selectedDifficulty === "All"
+  ? [
+      ...quizData.filter(q => q.difficulty === "Easy"),
+      ...quizData.filter(q => q.difficulty === "Medium"),
+      ...quizData.filter(q => q.difficulty === "Hard"),
+      ...quizData.filter(q => q.difficulty === "Difficult")
+    ]
+  : quizData.filter(q => q.difficulty === selectedDifficulty);
+
+}
+
+function startQuiz() {
+  const nameInput = document.getElementById("name-input").value.trim();
+  if (!nameInput) return alert("Enter your name");
+
+  players.push({ name: nameInput, score: 0 });
+  if (mode === "multi" && players.length < 2) {
+    document.getElementById("name-input").value = "";
+    document.getElementById("player-label").textContent = "Enter Player 2 Name";
+    return;
+  }
+  nameScreen.classList.add("hidden");
+  quizScreen.classList.remove("hidden");
+  loadQuestion();
+}
+
+function loadQuestion() {
+  if (currentQuestion >= filteredQuestions.length) {
+    currentQuestion = 0;
+    currentPlayer++;
+    if (mode === "multi" && currentPlayer < players.length) {
+      alert(`Now it's ${players[currentPlayer].name}'s turn!`);
+      loadQuestion();
+      return;
+    } else {
+      showFinalResult();
+      return;
+    }
+  }
+  const q = filteredQuestions[currentQuestion];
+  playerNameEl.textContent = `Player: ${players[currentPlayer].name}`;
+  questionCountEl.textContent = `Question ${currentQuestion + 1} / ${filteredQuestions.length}`;
+  difficultyEl.textContent = `Difficulty: ${q.difficulty}`;
+  questionEl.textContent = q.question;
+  optionsEl.innerHTML = "";
+  if (q.image) {
+    imgEl.src = q.image;
+    imgEl.style.display = "block";
+  } else {
+    imgEl.style.display = "none";
+  }
+  q.options.forEach((opt, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<input type="radio" name="option" value="${index}"> ${opt}`;
+    optionsEl.appendChild(li);
+  });
+  resultEl.textContent = "";
+  updateLiveLeaderboard();
+  startTimer();
+}
+
+function startTimer() {
+  timeLeft = 15;
+  timerEl.textContent = `Time left: ${timeLeft}s`;
+  timer = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = `Time left: ${timeLeft}s`;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      resultEl.textContent = "⏰ Time's up!";
+      setTimeout(nextQuestion, 2000);  // Go to next question after 2 second
+    }
+  }, 1000);
+}
+
+submitBtn.addEventListener("click", () => {
+  clearInterval(timer);
+  const selected = document.querySelector('input[name="option"]:checked');
+  const correctAnswerIndex = filteredQuestions[currentQuestion].answer;
+
+  // Reset all option styles
+  document.querySelectorAll('#options li').forEach(li => {
+    li.style.backgroundColor = "";
+    li.style.color = "";
+  });
+
+  if (!selected) {
+    resultEl.textContent = "Please select an option!";
+    resultEl.style.color = "#e67e22"; // Orange
+    return;
+  }
+
+  const answer = parseInt(selected.value);
+  const optionItems = document.querySelectorAll('#options li');
+
+  if (answer === correctAnswerIndex) {
+    resultEl.textContent = "✅ Correct!";
+    resultEl.style.color = "green";
+    players[currentPlayer].score++;
+    optionItems[answer].style.backgroundColor = "#d4edda"; // light green
+    optionItems[answer].style.color = "#155724"; // dark green text
+  } else {
+    resultEl.textContent = "❌ Wrong! The correct answer was: " + 
+      filteredQuestions[currentQuestion].options[correctAnswerIndex];
+    resultEl.style.color = "red";
+    optionItems[answer].style.backgroundColor = "#f8d7da"; // light red
+    optionItems[answer].style.color = "#721c24"; // dark red text
+    optionItems[correctAnswerIndex].style.backgroundColor = "#d4edda"; // highlight correct
+    optionItems[correctAnswerIndex].style.color = "#155724";
+  }
+
+  setTimeout(nextQuestion, 2000); // extra time to read feedback
+});
+
+
+function nextQuestion() {
+  currentQuestion++;
+  loadQuestion();
+}
+
+function showFinalResult() {
+  quizScreen.classList.add("hidden");
+  finalScreen.classList.remove("hidden");
+  players.sort((a, b) => b.score - a.score);
+  finalMsgEl.innerHTML = players.map(p => `${p.name}: ${p.score}/${filteredQuestions.length}`).join("<br>");
+  leaderboardEl.innerHTML = "";
+  players.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = `${p.name} - ${p.score}`;
+    leaderboardEl.appendChild(li);
+  });
+  saveHighScores();
+}
+
+function saveHighScores() {
+  const previousScores = JSON.parse(localStorage.getItem("quizScores") || "[]");
+  const updated = [...previousScores, ...players].sort((a,b)=>b.score-a.score).slice(0,10);
+  localStorage.setItem("quizScores", JSON.stringify(updated));
+  console.log("Leaderboard saved:", updated);
+}
+function resetLeaderboard() {
+  if (confirm("Are you sure you want to reset the leaderboard?")) {
+    localStorage.removeItem("quizScores");
+    alert("Leaderboard has been reset.");
+  }
+}
+</script>
+</body>
+</html>
