@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8" />
   <title>Quiz Game</title>
   <style>
@@ -13,17 +14,20 @@
       align-items: center;
       height: 100vh;
     }
-    .quiz-container {
+   .quiz-container {
   background: #ffffff;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  width: 95%;
-  max-width: 600px;
-  text-align: center;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100%;
   box-sizing: border-box;
-  font-size: 1.2rem; /* Increase base size */
+  text-align: center;
+  font-size: 1.2rem;
+  overflow-y: auto;
 }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -132,38 +136,30 @@
       0% { transform: scale(0.8); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
-	  @media (max-width: 768px) {
-  body {
-    font-size: 18px;
-  }
-
+@media (max-width: 768px) {
   .quiz-container {
-    width: 100%;
-    padding: 25px 15px;
     font-size: 1.3rem;
-  }
-
-  .question {
-    font-size: 1.4rem;
   }
 
   .options input {
     transform: scale(1.4);
+    margin-right: 10px;
   }
 
   button {
-    font-size: 1.2rem;
-    padding: 14px 22px;
+    font-size: 1.1rem;
+    padding: 14px 24px;
   }
 
   #timer {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   #result {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 }
+
 
   </style>
 </head>
