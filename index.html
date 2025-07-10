@@ -183,6 +183,17 @@
     <p>Challenge your brain with questions of all levels. Are you ready?</p>
     <button onclick="startGame()">Start the Challenge</button>
   </div>
+	<div id="signup-screen" class="quiz-container">
+  <h2>Sign Up to Start the Quiz</h2>
+  <input type="text" id="signup-name" placeholder="Your name" required><br><br>
+  <input type="email" id="signup-email" placeholder="Your email" required><br><br>
+  <label>
+    <input type="checkbox" id="signup-consent" required>
+    I agree to share my details for quiz participation.
+  </label><br><br>
+  <button onclick="submitSignup()">Start Quiz</button>
+</div>
+
 
   <div class="quiz-container hidden" id="mode-screen">
     <h2>Select Game Mode</h2>
@@ -237,6 +248,34 @@
 </div>
 
 <script>
+	const googleScriptURL = https://script.google.com/macros/s/AKfycbzoB9-nBT36H_7lUvKAfSZFF2MriGxSNU0wX6AokK4nCkmUbhpg3uZIAbFd9AiJbh3y/exec;
+
+function submitSignup() {
+  const name = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const consent = document.getElementById("signup-consent").checked;
+
+  if (!name || !email || !consent) {
+    alert("Please fill all fields and agree to continue.");
+    return;
+  }
+
+  fetch(googleScriptURL, {
+    method: 'POST',
+    body: new URLSearchParams({ name, email })
+  })
+  .then(response => response.text())
+  .then(() => {
+    document.getElementById("signup-screen").style.display = "none";
+    document.getElementById("quiz-screen").classList.remove("hidden");
+    players.push({ name, score: 0 });
+    loadQuestion();
+  })
+  .catch(error => {
+    alert("Something went wrong. Please try again.");
+    console.error("Error:", error);
+  });
+}
 function startGame() {
       document.getElementById("welcome-screen").classList.add("hidden");
       document.getElementById("mode-screen").classList.remove("hidden");
