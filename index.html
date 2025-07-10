@@ -131,6 +131,24 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
+	  .main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  max-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.quiz-container {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
     #welcome-screen {
       background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
       animation: popIn 1s ease-out;
@@ -178,21 +196,23 @@
 	
 </head>
 <body>
-<div class="quiz-container" id="welcome-screen">
-    <h1>🎉 Welcome to Sahal's Quiz 🎉</h1>
-    <p>Challenge your brain with questions of all levels. Are you ready?</p>
-    <button onclick="startGame()">Start the Challenge</button>
-  </div>
-	<div id="signup-screen" class="quiz-container">
-  <h2>Sign Up to Start the Quiz</h2>
-  <input type="text" id="signup-name" placeholder="Your name" required><br><br>
-  <input type="email" id="signup-email" placeholder="Your email" required><br><br>
-  <label>
-    <input type="checkbox" id="signup-consent" required>
-    I agree to share my details for quiz participation.
-  </label><br><br>
-  <button onclick="submitSignup()">Start Quiz</button>
-</div>
+  <div class="main-container">
+    <div class="quiz-container" id="welcome-screen">
+      <h1>🎉 Welcome to Sahal's Quiz 🎉</h1>
+      <p>Challenge your brain with questions of all levels.<br>Are you ready?</p>
+      <button onclick="scrollToSignup()">Start the Challenge</button>
+    </div>
+
+    <div class="quiz-container" id="signup-screen">
+      <h2>Sign Up to Start the Quiz</h2>
+      <input type="text" id="signup-name" placeholder="Your name" required><br><br>
+      <input type="email" id="signup-email" placeholder="Your email" required><br><br>
+      <label>
+        <input type="checkbox" id="signup-consent" required>
+        I agree to share my details for quiz participation.
+      </label><br><br>
+      <button onclick="submitSignup()">Start Quiz</button>
+    </div>
 
 
   <div class="quiz-container hidden" id="mode-screen">
@@ -254,6 +274,10 @@ function submitSignup() {
   const name = document.getElementById("signup-name").value.trim();
   const email = document.getElementById("signup-email").value.trim();
   const consent = document.getElementById("signup-consent").checked;
+	function scrollToSignup() {
+  document.getElementById("signup-screen").scrollIntoView({ behavior: "smooth" });
+}
+
 
   if (!name || !email || !consent) {
     alert("Please fill all fields and agree to continue.");
