@@ -224,6 +224,18 @@
   document.getElementById(from).classList.add("hidden");
   document.getElementById(to).classList.remove("hidden");
 }
+	function validateSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const consent = document.getElementById('signup-consent').checked;
+
+  if (!name || !email || !consent) {
+    alert("Please fill in all fields and agree to the terms before continuing.");
+    return;
+  }
+
+  goToScreen('signup-screen', 'mode-screen');
+}
 function startGame() {
       document.getElementById("welcome-screen").classList.add("hidden");
       document.getElementById("mode-screen").classList.remove("hidden");
