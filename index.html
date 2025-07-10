@@ -131,23 +131,7 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-	  .main-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 30px;
-  width: 100%;
-  max-width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
-}
 
-.quiz-container {
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
-}
 
     #welcome-screen {
       background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
@@ -196,14 +180,14 @@
 	
 </head>
 <body>
-  <div class="main-container">
+  
     <div class="quiz-container" id="welcome-screen">
       <h1>🎉 Welcome to Sahal's Quiz 🎉</h1>
       <p>Challenge your brain with questions of all levels.<br>Are you ready?</p>
       <button onclick="scrollToSignup()">Start the Challenge</button>
     </div>
 
-    <div class="quiz-container" id="signup-screen">
+    <div class="quiz-container hidden" id="signup-screen">
       <h2>Sign Up to Start the Quiz</h2>
       <input type="text" id="signup-name" placeholder="Your name" required><br><br>
       <input type="email" id="signup-email" placeholder="Your email" required><br><br>
