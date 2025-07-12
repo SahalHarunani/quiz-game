@@ -40,14 +40,6 @@
   text-align: center;
   font-size: 1.2rem;
 }
-	  .hidden { display: none; }
-  input[type="text"], input[type="email"] {
-    padding: 8px 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    width: 90%;
-  }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
@@ -186,18 +178,10 @@
 </head>
 <body>
 <div class="quiz-container" id="welcome-screen">
-  <h1>🎉 Welcome to Sahal's Quiz 🎉</h1>
-  <p>Challenge your brain with questions of all levels. Are you ready?</p>
-  <button onclick="goToScreen('welcome-screen', 'signup-screen')">Start the Challenge</button>
-</div>
-
-<div class="quiz-container hidden" id="signup-screen">
-  <h2>Sign Up to Start the Quiz</h2>
-  <input type="text" id="signup-name" placeholder="Your name"><br><br>
-  <input type="email" id="signup-email" placeholder="Your email"><br><br>
-  <button onclick="goToScreen('signup-screen', 'welcome-screen')">← Back to Home</button>
-  <button onclick="validateSignup()">Continue</button>
-</div>
+    <h1>🎉 Welcome to Sahal's Quiz 🎉</h1>
+    <p>Challenge your brain with questions of all levels. Are you ready?</p>
+    <button onclick="startGame()">Start the Challenge</button>
+  </div>
 
   <div class="quiz-container hidden" id="mode-screen">
     <h2>Select Game Mode</h2>
@@ -252,22 +236,6 @@
 </div>
 
 <script>
-	function goToScreen(from, to) {
-  document.getElementById(from).classList.add("hidden");
-  document.getElementById(to).classList.remove("hidden");
-}
-
-function validateSignup() {
-  const name = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-
-  if (!name || !email) {
-    alert("Please enter both your name and email before continuing.");
-    return;
-  }
-
-  goToScreen('signup-screen', 'mode-screen');
-}
 function startGame() {
       document.getElementById("welcome-screen").classList.add("hidden");
       document.getElementById("mode-screen").classList.remove("hidden");
